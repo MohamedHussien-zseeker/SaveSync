@@ -4,7 +4,7 @@
 
 Hundreds of hours of progress can disappear because of a corrupted file, a failed SSD, or a Windows reinstall. SaveSync quietly protects your saves so you can spend your time playing instead of worrying about backups.
 
-[Download v2.4.0-beta1](link) · [Release Notes](docs/RELEASE_NOTES.md) · [Beta Status](docs/BETA_STATUS.md)
+[Download v2.4.0-beta1](https://github.com/MohamedHussien-zseeker/SaveSync/releases/tag/v2.4.0-beta1) · [Release Notes](docs/RELEASE_NOTES.md) · [Beta Status](docs/BETA_STATUS.md)
 
 > ⚠ This is beta software. See [docs/BETA_STATUS.md](docs/BETA_STATUS.md) for known limitations and what to expect.
 >
@@ -37,7 +37,7 @@ A manual backup works — until you forget, or the copy is corrupted and you don
 
 ## Quick Start
 
-1. **Download** SaveSync.exe from the [latest release](link).
+1. **Download** SaveSync.exe from the [latest release](https://github.com/MohamedHussien-zseeker/SaveSync/releases/latest).
 2. **Launch it** — the main window opens with a Default profile.
 3. **Choose your save folder** — click "Add Folder" and select your game's save directory.
 4. **Choose a backup destination** — pick a local folder, external drive, or USB stick.
