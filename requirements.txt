@@ -1,0 +1,11 @@
+# Optional — install only for extra features:
+#   pyinotify  → instant file sync (Linux, replaces polling)
+#   dropbox    → Dropbox cloud backup
+#   google-api-python-client → Google Drive cloud backup
+#   keyring    → Windows Credential Manager access (falls back to file store)
+#
+# Core works with zero deps (local folder + polling).
+# All OAuth flows use stdlib urllib only.
+#
+# Python 3.7 compatible versions (pinned for PyInstaller Windows builds):
+#   pip install pyinstaller dropbox==11.36.2 keyring

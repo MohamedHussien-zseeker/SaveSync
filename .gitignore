@@ -1,0 +1,45 @@
+# Byte-compiled
+__pycache__/
+*.py[cod]
+
+# Testing
+.pytest_cache/
+
+# Build output
+build/
+dist/
+
+# Logs
+*.log
+logs/
+
+# Old/backup files
+*.old
+
+# Editor
+.vscode/
+.idea/
+
+# Pipeline artifacts
+.metadata.json
+
+# Environment
+.env
+
+# PyInstaller spec files
+*.spec
+
+# Coverage data
+.coverage
+coverage/
+
+# Source archives
+*.tar.gz
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Runtime artifacts
+savesync.log
+manifest.json

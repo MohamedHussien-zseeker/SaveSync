@@ -1,0 +1,13 @@
+* text=auto
+
+*.py text
+*.md text
+*.yml text
+*.yaml text
+*.json text
+*.txt text
+*.bat text
+
+*.png binary
+*.exe binary
+*.tar.gz binary
