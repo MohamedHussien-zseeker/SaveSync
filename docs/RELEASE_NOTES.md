@@ -51,11 +51,11 @@ Hundreds of automated tests verify profile management, cloud connections, sync/r
 
 ## Download
 
-**Windows executable (recommended):** `SaveSync.exe` (pending Windows packaging)
+**Windows build:** Coming soon. A GitHub Actions workflow (`.github/workflows/build-windows.yml`) is ready to produce the Windows EXE automatically. Push a tag and the workflow builds, signs, and uploads it. Windows validation is the final gate before `v2.0.0` stable. This RC validates the Linux build only.
 
-**Linux development build:** `SaveSync` (included below)
+**Linux x64:** `SaveSync-v2.0.0-rc.1-linux-x64` (included below)
 
-*No installation required — just download and run.*
+*No installation required — just download, chmod +x, and run.*
 
 ---
 

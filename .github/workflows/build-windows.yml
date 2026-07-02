@@ -1,0 +1,107 @@
+name: Build Windows Executable
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to build (leave empty for current commit)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ['3.12']
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+
+      - name: Display build info
+        run: |
+          python --version
+          pyinstaller --version
+
+      - name: Build executable with PyInstaller
+        run: |
+          pyinstaller SaveSync.spec --noconfirm
+
+      - name: Verify executable
+        run: |
+          $exe = "dist\SaveSync.exe"
+          if (-not (Test-Path $exe)) {
+            Write-Error "EXE not found at $exe"
+            exit 1
+          }
+          $size = (Get-Item $exe).Length
+          Write-Host "EXE size: $size bytes ($([math]::Round($size / 1MB, 2)) MB)"
+
+          # Verify it's a PE executable
+          $header = (Get-Content $exe -Encoding Byte -TotalCount 2)
+          if ($header[0] -ne 0x4D -or $header[1] -ne 0x5A) {
+            Write-Error "Not a valid PE executable (missing MZ header)"
+            exit 1
+          }
+          Write-Host "PE header verified (MZ)"
+
+          # Quick smoke test: --version
+          $result = & $exe --version 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Executable --version failed with exit code $LASTEXITCODE"
+            exit 1
+          }
+          Write-Host "Version output: $result"
+
+      - name: Compute SHA-256 checksum
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash -Path "dist\SaveSync.exe" -Algorithm SHA256).Hash.ToLower()
+          $filename = "SaveSync-v${{ github.event.release.tag_name || github.ref_name }}-windows-x64.exe"
+          $checksums = @"
+          SHA256 ($filename) = $hash
+          "@
+          Set-Content -Path "dist\SHA256SUMS.txt" -Value $checksums
+          Write-Host "SHA256: $hash"
+
+      - name: Upload EXE as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SaveSync-windows-x64
+          path: |
+            dist\SaveSync.exe
+            dist\SHA256SUMS.txt
+          compression-level: 0
+
+      - name: Upload EXE to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $tag = "${{ github.event.release.tag_name }}"
+          $exe_name = "SaveSync-$tag-windows-x64.exe"
+          Copy-Item "dist\SaveSync.exe" "dist\$exe_name"
+
+          gh release upload $tag "dist\$exe_name" --clobber
+          gh release upload $tag "dist\SHA256SUMS.txt" --clobber
+
+          Write-Host "Uploaded $exe_name and SHA256SUMS.txt to release $tag"
