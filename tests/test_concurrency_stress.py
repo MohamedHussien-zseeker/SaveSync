@@ -21,18 +21,19 @@ def _make_files(src_dir, n, size):
         (src_dir / f"f_{i}.txt").write_text("x" * size)
 
 
-def _check_invariants(worker, gen_before, gen_after, baseline, label=""):
-    assert gen_after >= gen_before, f"{label}: gen counter regressed"
+def _check_invariants(worker, state_before, state_after, baseline, label=""):
+    assert state_after is not state_before, \
+        f"{label}: op_state was not replaced (same object)"
+    assert state_after is not None, f"{label}: op_state is None after operation"
     assert threading.active_count() <= baseline + 4, \
         f"{label}: thread leak ({threading.active_count()} vs {baseline})"
-    if worker.op_state:
-        snap = worker.op_state.snapshot()
-        assert snap.is_terminal or snap.phase == "Failed", \
-            f"{label}: non-terminal phase {snap.phase}"
-        assert snap.bytes_transferred <= snap.bytes_total or snap.bytes_total == 0, \
-            f"{label}: bytes exceeded total"
-        assert snap.files_completed <= snap.files_total or snap.files_total == 0, \
-            f"{label}: files exceeded total"
+    snap = state_after.snapshot()
+    assert snap.is_terminal or snap.phase == "Failed", \
+        f"{label}: non-terminal phase {snap.phase}"
+    assert snap.bytes_transferred <= snap.bytes_total or snap.bytes_total == 0, \
+        f"{label}: bytes exceeded total"
+    assert snap.files_completed <= snap.files_total or snap.files_total == 0, \
+        f"{label}: files exceeded total"
 
 
 class TestM5ConcurrencyStress:
@@ -57,7 +58,7 @@ class TestM5ConcurrencyStress:
         core = SaveSyncCore()
         worker = SyncWorker(core, profile)
 
-        gen_before = id(worker.op_state)
+        state_before = worker.op_state
         results = {}
         done_ev = threading.Event()
         cancelled = threading.Event()
@@ -84,8 +85,8 @@ class TestM5ConcurrencyStress:
         worker.sync_all(done_callback=done)
         done_ev.wait(timeout=30)
 
-        gen_after = id(worker.op_state)
-        _check_invariants(worker, gen_before, gen_after,
+        state_after = worker.op_state
+        _check_invariants(worker, state_before, state_after,
                           BASELINE_THREADS, f"cycle {seed} (sync)")
         snap = worker.op_state.snapshot()
         if cancelled.is_set():
@@ -129,13 +130,13 @@ class TestM5ConcurrencyStress:
                         return
                 time.sleep(0.005)
 
-        gen_before2 = id(worker2.op_state)
+        state_before2 = worker2.op_state
         threading.Thread(target=watcher2, daemon=True).start()
         worker2.restore_all(done_callback=done2, verify=False)
         done_ev2.wait(timeout=30)
 
-        gen_after2 = id(worker2.op_state)
-        _check_invariants(worker2, gen_before2, gen_after2,
+        state_after2 = worker2.op_state
+        _check_invariants(worker2, state_before2, state_after2,
                           BASELINE_THREADS, f"cycle {seed} (restore)")
         snap2 = worker2.op_state.snapshot()
         if cancelled2.is_set():
@@ -150,7 +151,12 @@ class TestM5ConcurrencyStress:
     def test_deterministic_cycles(self):
         """50 deterministic cycles: sync + cancel + restore + cancel."""
         for i in range(50):
-            self._run_one_cycle(i, n_files=150, cancel_at=15)
+            try:
+                self._run_one_cycle(i, n_files=150, cancel_at=15)
+            except AssertionError:
+                print(f"\n[FAIL] deterministic cycle {i}: seed={i}, "
+                      f"n_files=150, cancel_at=15")
+                raise
 
     def test_randomized_cycles(self):
         """50 randomized cycles with varying files, sizes, cancel points."""
@@ -162,7 +168,12 @@ class TestM5ConcurrencyStress:
             cancel_at = rng.randint(20, max(20, n_files // 3))
             seed = rng.randrange(2**16)
             t0 = time.perf_counter()
-            self._run_one_cycle(seed, n_files, cancel_at)
+            try:
+                self._run_one_cycle(seed, n_files, cancel_at)
+            except AssertionError:
+                print(f"\n[FAIL] cycle {i}: seed={seed}, n_files={n_files}, "
+                      f"cancel_at={cancel_at}, master_seed={master_seed}")
+                raise
             elapsed = time.perf_counter() - t0
             timings.append(elapsed)
 
