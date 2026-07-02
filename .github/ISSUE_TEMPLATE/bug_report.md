@@ -1,38 +1,31 @@
 ---
-name: Bug Report
-about: Report a problem with SaveSync
+name: Bug report
+about: Create a report to help improve SaveSync
+title: ''
 labels: bug
+assignees: ''
 ---
 
-## Description
+**Describe the bug**
+A clear and concise description of what the bug is.
 
-<!-- What happened? What did you expect to happen? -->
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
 
-## Environment
+**Expected behavior**
+A clear and concise description of what you expected to happen.
 
-- **Windows version:**
-- **SaveSync version:** (run `SaveSync.exe --version`)
-- **Provider:** (Local / Dropbox / Google Drive / OneDrive)
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
 
-## Steps to Reproduce
+**Environment (please complete the following):**
+- OS: [e.g. Windows 11]
+- SaveSync version: [e.g. v2.0.0-rc.1]
+- Storage provider: [e.g. Local, Google Drive, Dropbox, OneDrive]
 
-1.
-2.
-3.
-
-## Actual Behavior
-
-## Expected Behavior
-
-## Logs
-
-<!-- Attach or paste relevant lines from ~/.savesync/logs/error.log -->
-
-## Severity
-
-<!--
-P0 — Data loss, crash, or unrecoverable error
-P1 — Broken workflow, incorrect behavior
-P2 — Confusing UI or documentation
-P3 — Enhancement request
--->
+**Additional context**
+Add any other context about the problem here.
