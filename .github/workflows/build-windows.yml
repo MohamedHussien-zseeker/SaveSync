@@ -1,4 +1,4 @@
-name: Build Windows Executable
+name: Build Release Artifacts
 
 on:
   release:
@@ -14,11 +14,24 @@ permissions:
   contents: write
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
+  build:
     strategy:
       matrix:
-        python-version: ['3.12']
+        include:
+          - os: windows-latest
+            suffix: windows-x64.exe
+            artifact_name: SaveSync-windows-x64
+            smoke_cmd: |
+              $result = & "dist\SaveSync.exe" --version 2>&1
+              if ($LASTEXITCODE -ne 0) { exit 1 }
+              $result
+          - os: ubuntu-latest
+            suffix: linux-x64
+            artifact_name: SaveSync-linux-x64
+            smoke_cmd: |
+              ./dist/SaveSync --version
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout source
@@ -26,10 +39,10 @@ jobs:
         with:
           ref: ${{ github.event.inputs.tag || github.ref }}
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
@@ -40,68 +53,108 @@ jobs:
         run: |
           python --version
           pyinstaller --version
+          echo "ref=${{ github.ref }}"
+          echo "tag=${{ github.event.release.tag_name }}"
 
       - name: Build executable with PyInstaller
-        run: |
-          pyinstaller SaveSync.spec --noconfirm
+        run: pyinstaller SaveSync.spec --noconfirm
 
       - name: Verify executable
+        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash' }}
         run: |
-          $exe = "dist\SaveSync.exe"
-          if (-not (Test-Path $exe)) {
-            Write-Error "EXE not found at $exe"
+          # Check file exists
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            exe="dist\SaveSync.exe"
+          else
+            exe="dist/SaveSync"
+          fi
+          if [ ! -f "$exe" ]; then
+            echo "ERROR: $exe not found"
+            exit 1
+          fi
+          size=$(stat -c%s "$exe" 2>/dev/null || (Get-Item "$exe").Length)
+          echo "Size: $size bytes"
+
+          # Verify PE header on Windows
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            header=$(powershell -Command "(Get-Content '$exe' -Encoding Byte -TotalCount 2) -join ','")
+            if [ "$header" != "77,90" ]; then
+              echo "ERROR: Not a valid PE executable"
+              exit 1
+            fi
+            echo "PE header verified (MZ)"
+          fi
+
+          # Smoke test: --version
+          eval "${{ matrix.smoke_cmd }}" || {
+            echo "ERROR: --version smoke test failed"
             exit 1
           }
-          $size = (Get-Item $exe).Length
-          Write-Host "EXE size: $size bytes ($([math]::Round($size / 1MB, 2)) MB)"
+          echo "Smoke test passed"
 
-          # Verify it's a PE executable
-          $header = (Get-Content $exe -Encoding Byte -TotalCount 2)
-          if ($header[0] -ne 0x4D -or $header[1] -ne 0x5A) {
-            Write-Error "Not a valid PE executable (missing MZ header)"
-            exit 1
-          }
-          Write-Host "PE header verified (MZ)"
-
-          # Quick smoke test: --version
-          $result = & $exe --version 2>&1
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "Executable --version failed with exit code $LASTEXITCODE"
-            exit 1
-          }
-          Write-Host "Version output: $result"
-
-      - name: Compute SHA-256 checksum
-        shell: pwsh
+      - name: Compute SHA-256
+        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash' }}
         run: |
-          $hash = (Get-FileHash -Path "dist\SaveSync.exe" -Algorithm SHA256).Hash.ToLower()
-          $filename = "SaveSync-v${{ github.event.release.tag_name || github.ref_name }}-windows-x64.exe"
-          $checksums = @"
-          SHA256 ($filename) = $hash
-          "@
-          Set-Content -Path "dist\SHA256SUMS.txt" -Value $checksums
-          Write-Host "SHA256: $hash"
+          TAG="${{ github.event.release.tag_name || github.ref_name }}"
+          FILENAME="SaveSync-${TAG}-${{ matrix.suffix }}"
 
-      - name: Upload EXE as workflow artifact
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            hash=$(Get-FileHash -Path "dist\SaveSync.exe" -Algorithm SHA256).Hash.ToLower()
+            Copy-Item "dist\SaveSync.exe" "dist\$FILENAME"
+          else
+            hash=$(sha256sum "dist/SaveSync" | cut -d' ' -f1)
+            cp "dist/SaveSync" "dist/${FILENAME}.tar.gz"
+            tar -czf "dist/${FILENAME}.tar.gz" -C dist SaveSync
+          fi
+          echo "$hash" > "dist/${FILENAME}.sha256"
+          echo "SHA256 ($FILENAME) = $hash"
+
+      - name: Generate build report
+        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash' }}
+        run: |
+          TAG="${{ github.event.release.tag_name || github.ref_name }}"
+          COMMIT="${{ github.sha }}"
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          PYTHON_VER=$(python --version 2>&1)
+          PYI_VER=$(pyinstaller --version 2>&1)
+          EXE_NAME="SaveSync-${TAG}-${{ matrix.suffix }}"
+
+          cat > "dist/build-report-${{ matrix.suffix }}.txt" <<EOF
+          Build Report
+          ============
+          Timestamp:    $TIMESTAMP
+          Commit:       $COMMIT
+          Tag:          $TAG
+          Platform:     ${{ matrix.os }}
+          Python:       $PYTHON_VER
+          PyInstaller:  $PYI_VER
+          Artifact:     $EXE_NAME
+          SHA-256:      $(cat "dist/${EXE_NAME}.sha256")
+          Smoke test:   PASSED
+          PE verify:    ${{ matrix.os == 'windows-latest' && 'PASSED' || 'N/A (Linux ELF)' }}
+          EOF
+
+          echo "=== Build Report ==="
+          cat "dist/build-report-${{ matrix.suffix }}.txt"
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SaveSync-windows-x64
-          path: |
-            dist\SaveSync.exe
-            dist\SHA256SUMS.txt
+          name: ${{ matrix.artifact_name }}
+          path: dist/SaveSync*
           compression-level: 0
 
-      - name: Upload EXE to release
+      - name: Upload to release
         if: github.event_name == 'release'
         env:
           GH_TOKEN: ${{ github.token }}
-        shell: pwsh
+        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash' }}
         run: |
-          $tag = "${{ github.event.release.tag_name }}"
-          $exe_name = "SaveSync-$tag-windows-x64.exe"
-          Copy-Item "dist\SaveSync.exe" "dist\$exe_name"
+          TAG="${{ github.event.release.tag_name }}"
+          EXE_NAME="SaveSync-${TAG}-${{ matrix.suffix }}"
 
-          gh release upload $tag "dist\$exe_name" --clobber
-          gh release upload $tag "dist\SHA256SUMS.txt" --clobber
+          gh release upload "$TAG" "dist/${EXE_NAME}" --clobber
+          gh release upload "$TAG" "dist/${EXE_NAME}.sha256" --clobber
+          gh release upload "$TAG" "dist/build-report-${{ matrix.suffix }}.txt" --clobber
 
-          Write-Host "Uploaded $exe_name and SHA256SUMS.txt to release $tag"
+          echo "Uploaded ${EXE_NAME} and build report to release ${TAG}"
