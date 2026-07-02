@@ -4,6 +4,8 @@
 
 SaveSync automatically backs up, syncs, and restores your PC game saves so you can recover from crashes, reinstalls, or hardware failures with a single click.
 
+> **Version note:** SaveSync has been extensively rewritten since the earlier experimental builds. Version 2.0.0 starts a new release line and supersedes the previous `v2.4.0-beta1` releases.
+
 ---
 
 ## What's New
