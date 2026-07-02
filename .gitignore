@@ -28,6 +28,7 @@ logs/
 
 # PyInstaller spec files
 *.spec
+!SaveSync.spec
 
 # Coverage data
 .coverage
