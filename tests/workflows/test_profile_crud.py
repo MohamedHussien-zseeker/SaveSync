@@ -11,7 +11,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 import pytest
 from tests.fixtures.app_factory import create_app
-from tests.helpers.ui_actions import click_button, select_tree_item
 
 
 class TestProfileCRUD:
@@ -19,14 +18,11 @@ class TestProfileCRUD:
     def test_default_profile_exists_on_launch(self, tmp_path, monkeypatch):
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            tree = refs.get("tree")
-            assert tree is not None, "Profile treeview not found"
-            items = tree.get_children()
-            assert len(items) >= 1, "Expected at least one profile on launch"
-            first = tree.item(items[0], "values")
-            assert any("Default" in str(v) for v in first), (
-                f"Expected 'Default' profile, got {first}"
-            )
+            app = refs.get("app")
+            profile_btns = app.profile_list_frame.winfo_children()
+            assert len(profile_btns) >= 1, "Expected at least one profile on launch"
+            text = profile_btns[0].cget("text")
+            assert "Default" in text, f"Expected 'Default' profile, got '{text}'"
         finally:
             root.destroy()
 
@@ -46,14 +42,11 @@ class TestProfileCRUD:
 
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            tree = refs.get("tree")
-            items = tree.get_children()
-            names = []
-            for item in items:
-                vals = tree.item(item, "values")
-                names.extend(v for v in vals if v)
-            assert "PersistedProfile" in names, (
-                f"Persisted profile not found in tree: {names}"
+            app = refs.get("app")
+            profile_btns = app.profile_list_frame.winfo_children()
+            texts = [b.cget("text") for b in profile_btns]
+            assert "PersistedProfile" in texts, (
+                f"Persisted profile not found: {texts}"
             )
         finally:
             root.destroy()
@@ -61,17 +54,12 @@ class TestProfileCRUD:
     def test_select_profile_updates_detail_view(self, tmp_path, monkeypatch):
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            tree = refs.get("tree")
-            items = tree.get_children()
-            assert len(items) >= 1
-
-            select_tree_item(tree, items[0])
+            app = refs.get("app")
+            profile_btns = app.profile_list_frame.winfo_children()
+            assert len(profile_btns) >= 1
+            profile_btns[0].invoke()
             root.update()
-
-            profile_lbl = refs.get("lbl_")
-            notebook = refs.get("notebook")
-            assert notebook is not None
-
+            assert app.profile_name_val.cget("text") != ""
         finally:
             root.destroy()
 
@@ -91,11 +79,10 @@ class TestProfileCRUD:
 
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            tree = refs.get("tree")
-            items = tree.get_children()
-            assert len(items) == 2
-
-            select_tree_item(tree, items[0])
+            app = refs.get("app")
+            profile_btns = app.profile_list_frame.winfo_children()
+            assert len(profile_btns) == 2
+            profile_btns[0].invoke()
             root.update()
         finally:
             root.destroy()
@@ -103,13 +90,9 @@ class TestProfileCRUD:
     def test_delete_last_profile_not_allowed(self, tmp_path, monkeypatch):
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            del_btn = refs.get("btn_— Delete")
-            tree = refs.get("tree")
-
-            if del_btn and tree:
-                items = tree.get_children()
-                if len(items) < 2:
-                    pass
-
+            del_btn = refs.get("btn_Delete")
+            app = refs.get("app")
+            profile_btns = app.profile_list_frame.winfo_children()
+            assert del_btn is not None or len(profile_btns) >= 1
         finally:
             root.destroy()

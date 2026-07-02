@@ -10,20 +10,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 import pytest
 from tests.fixtures.app_factory import create_app
-from tests.helpers.ui_actions import select_tab, click_button
+from tests.helpers.ui_actions import navigate_to
 
 
 class TestProviderConnection:
 
-    def test_accounts_tab_exists(self, tmp_path, monkeypatch):
+    def test_accounts_page_exists(self, tmp_path, monkeypatch):
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            notebook = refs.get("notebook")
-            assert notebook is not None, "Notebook not found"
-
-            tab_count = notebook.index("end")
-            tab_texts = [notebook.tab(i, "text").strip() for i in range(tab_count)]
-            assert "Accounts" in tab_texts, f"Accounts tab not found in {tab_texts}"
+            app = refs.get("app")
+            assert app is not None
+            assert "cloud" in app.nav_btns, "Cloud/Accounts nav button not found"
         finally:
             root.destroy()
 
@@ -48,16 +45,10 @@ class TestProviderConnection:
     def test_navigate_to_accounts_and_back(self, tmp_path, monkeypatch):
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            notebook = refs.get("notebook")
-            assert notebook is not None
-
-            tab_texts = [notebook.tab(i, "text").strip() for i in range(notebook.index("end"))]
-            accounts_idx = tab_texts.index("Accounts")
-            select_tab(notebook, accounts_idx)
+            app = refs.get("app")
+            navigate_to(app, "cloud")
             root.update()
-
-            home_idx = tab_texts.index("Home")
-            select_tab(notebook, home_idx)
+            navigate_to(app, "home")
             root.update()
         finally:
             root.destroy()

@@ -3,31 +3,21 @@
 Provides stable, intent-based helpers for common UI operations
 so workflow tests read as scenarios rather than Tkinter plumbing.
 """
-import tkinter as tk
-from tkinter import ttk
 
 
-def select_tab(notebook: ttk.Notebook, index: int) -> None:
-    notebook.select(index)
+def navigate_to(app, page_name):
+    btn = app.nav_btns.get(page_name)
+    if btn:
+        btn.invoke()
 
 
-def click_button(button: ttk.Button) -> None:
+def click_button(button):
     button.invoke()
 
 
-def set_entry_text(entry: tk.Entry, text: str) -> None:
-    entry.delete(0, tk.END)
+def set_entry_text(entry, text):
+    entry.delete(0, "end")
     entry.insert(0, text)
 
 
-def select_tree_item(tree: ttk.Treeview, item_id: str) -> None:
-    tree.selection_set(item_id)
-    tree.focus(item_id)
-    tree.event_generate("<<TreeviewSelect>>")
 
-
-def select_listbox_item(listbox: tk.Listbox, index: int) -> None:
-    listbox.selection_clear(0, tk.END)
-    listbox.selection_set(index)
-    listbox.activate(index)
-    listbox.event_generate("<<ListboxSelect>>")

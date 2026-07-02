@@ -13,9 +13,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 import pytest
-from tests.fixtures.app_factory import create_app, find_button
+from tests.fixtures.app_factory import create_app
 from tests.fixtures.fake_filesystem import FakeFilesystem
-from tests.helpers.ui_actions import click_button, select_tab
 
 
 class TestSyncRestore:

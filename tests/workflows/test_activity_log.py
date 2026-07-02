@@ -10,17 +10,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from tests.fixtures.app_factory import create_app, find_button, find_scrolled_text
-from tests.helpers.ui_actions import click_button, select_tab
+from tests.helpers.ui_actions import navigate_to
 
 
 class TestActivityLog:
 
-    def test_activity_tab_exists(self, tmp_path, monkeypatch):
+    def test_activity_page_exists(self, tmp_path, monkeypatch):
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            notebook = refs.get("notebook")
-            tab_texts = [notebook.tab(i, "text").strip() for i in range(notebook.index("end"))]
-            assert "Activity" in tab_texts, f"Activity tab not found in {tab_texts}"
+            app = refs.get("app")
+            assert "activity" in app.nav_btns, "Activity nav button not found"
         finally:
             root.destroy()
 
@@ -28,7 +27,7 @@ class TestActivityLog:
         root, refs = create_app(tmp_path, monkeypatch)
         try:
             log_area = find_scrolled_text(root)
-            assert log_area is not None, "Log area (Text) not found"
+            assert log_area is not None, "Log area (CTkTextbox) not found"
             log_area.get("1.0", "end-1c")
         finally:
             root.destroy()
@@ -89,13 +88,10 @@ class TestActivityLog:
     def test_navigate_to_activity_and_back(self, tmp_path, monkeypatch):
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            notebook = refs.get("notebook")
-            tab_texts = [notebook.tab(i, "text").strip() for i in range(notebook.index("end"))]
-            act_idx = tab_texts.index("Activity")
-            select_tab(notebook, act_idx)
+            app = refs.get("app")
+            navigate_to(app, "activity")
             root.update()
-            home_idx = tab_texts.index("Home")
-            select_tab(notebook, home_idx)
+            navigate_to(app, "home")
             root.update()
         finally:
             root.destroy()

@@ -1,6 +1,6 @@
 """Create a SaveSync test app instance for workflow testing."""
 import tkinter as tk
-from tkinter import ttk
+import customtkinter as ctk
 
 
 def _walk_children(widget):
@@ -10,70 +10,63 @@ def _walk_children(widget):
 
 
 def find_notebook(root):
-    for w in _walk_children(root):
-        if isinstance(w, ttk.Notebook):
-            return w
     return None
 
 
 def find_button(root, text):
     for w in _walk_children(root):
-        if isinstance(w, ttk.Button) and w.cget("text") == text:
+        if isinstance(w, ctk.CTkButton) and w.cget("text") == text:
             return w
     return None
 
 
 def find_label(root, text_hint):
     for w in _walk_children(root):
-        if isinstance(w, ttk.Label) and text_hint in (w.cget("text") or ""):
+        if isinstance(w, ctk.CTkLabel) and text_hint in (w.cget("text") or ""):
             return w
     return None
 
 
 def find_treeview(root):
-    for w in _walk_children(root):
-        if isinstance(w, ttk.Treeview):
-            return w
     return None
 
 
 def find_listbox(root):
-    for w in _walk_children(root):
-        if isinstance(w, tk.Listbox):
-            return w
     return None
 
 
 def find_scrolled_text(root):
     for w in _walk_children(root):
-        if isinstance(w, tk.Text):
+        if isinstance(w, ctk.CTkTextbox):
             return w
     return None
 
 
 def find_labelframe(root, text):
     for w in _walk_children(root):
-        if isinstance(w, ttk.LabelFrame) and w.cget("text") == text:
-            return w
+        if isinstance(w, ctk.CTkLabel) and text in (w.cget("text") or ""):
+            parent = w.master
+            if parent and isinstance(parent, (ctk.CTkFrame, ctk.CTkScrollableFrame)):
+                return parent
     return None
 
 
 def find_label_containing(root, substring):
     for w in _walk_children(root):
-        if isinstance(w, ttk.Label) and substring in (w.cget("text") or ""):
+        if isinstance(w, ctk.CTkLabel) and substring in (w.cget("text") or ""):
             return w
     return None
 
 
 def find_progressbar(root):
     for w in _walk_children(root):
-        if isinstance(w, ttk.Progressbar):
+        if isinstance(w, ctk.CTkProgressBar):
             return w
     return None
 
 
-def get_tab_labels(notebook):
-    return [notebook.tab(i, "text") for i in range(notebook.index("end"))]
+def get_tab_labels(app):
+    return list(app.nav_btns.keys())
 
 
 def create_app(tmp_path, monkeypatch):
@@ -82,8 +75,8 @@ def create_app(tmp_path, monkeypatch):
     Patches config directories to tmp_path, prevents mainloop
     from blocking, and returns (root, refs_dict).
 
-    refs_dict contains: notebook, tree, dir_list, log_area,
-    and named buttons/labels keyed by their text.
+    refs_dict contains: app, nav_btns, and named buttons/labels
+    keyed by their text.
     """
     config_dir = tmp_path / ".config" / "savesync"
     monkeypatch.setattr("core.SaveSyncCore.CONFIG_DIR", config_dir)
@@ -92,49 +85,44 @@ def create_app(tmp_path, monkeypatch):
     core.ACCOUNTS_FILE = config_dir / "accounts.json"
 
     saved = tk.Tk.mainloop
-    roots = []
 
     def _noop_mainloop(self):
-        roots.append(self)
+        pass
 
     tk.Tk.mainloop = _noop_mainloop
 
     try:
         import SaveSync
-        SaveSync._main_impl()
-        root = roots[0] if roots else tk._default_root
-        if root is None:
-            raise RuntimeError("No Tk root created")
-
+        app = SaveSync._main_impl()
+        root = app.root
         root.update()
-        refs = _build_refs(root)
+        refs = _build_refs(root, app)
         return root, refs
     finally:
         tk.Tk.mainloop = saved
 
 
-def _build_refs(root):
+def _build_refs(root, app=None):
     refs = {}
     refs["root"] = root
-    refs["notebook"] = find_notebook(root)
+    if app:
+        refs["app"] = app
+        refs["nav_btns"] = app.nav_btns
 
     for w in _walk_children(root):
-        if isinstance(w, ttk.Button):
+        if isinstance(w, ctk.CTkButton):
             text = w.cget("text")
             key = f"btn_{text}"
             refs[key] = w
-        if isinstance(w, ttk.Label):
+        if isinstance(w, ctk.CTkLabel):
             text = w.cget("text") or ""
             if text:
                 key = f"lbl_{text}"
                 refs[key] = w
-
-    refs["tree"] = find_treeview(root)
-    refs["dir_list"] = find_listbox(root)
-
-    for w in _walk_children(root):
-        if isinstance(w, tk.Text):
-            refs["log_area"] = w
-            break
+        if isinstance(w, ctk.CTkTextbox):
+            if "log_area" not in refs:
+                refs["log_area"] = w
+        if isinstance(w, ctk.CTkProgressBar):
+            refs["progress"] = w
 
     return refs

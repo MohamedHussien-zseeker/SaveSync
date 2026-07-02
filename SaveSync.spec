@@ -9,14 +9,14 @@ a = Analysis(
     hiddenimports=[
         'core', 'providers', 'state', 'logging_system',
         'cloud', 'config_sync', 'credential_store',
-        'exceptions', 'transfer',
+        'exceptions', 'transfer', 'customtkinter',
     ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=['tkinter.test', 'PIL', 'Pillow', 'matplotlib',
               'numpy', 'pandas', 'scipy', 'cv2',
-              'tkinterdnd2', 'customtkinter'],
+              'tkinterdnd2'],
     noarchive=False,
 )
 

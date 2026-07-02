@@ -9,30 +9,28 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from tests.fixtures.app_factory import create_app, find_button, find_label_containing, find_labelframe
-from tests.helpers.ui_actions import select_tab
 from tests.helpers.assertions import assert_button_enabled
 
 
 class TestDashboard:
 
-    def test_home_tab_is_first(self, tmp_path, monkeypatch):
+    def test_home_page_is_first(self, tmp_path, monkeypatch):
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            notebook = refs.get("notebook")
-            assert notebook is not None
-            tab_texts = [notebook.tab(i, "text").strip() for i in range(notebook.index("end"))]
-            assert tab_texts[0] == "Home", f"First tab should be Home, got {tab_texts[0]}"
+            app = refs.get("app")
+            assert app is not None
+            first_nav = list(app.nav_btns.keys())[0]
+            assert first_nav == "home", f"First nav button should be home, got {first_nav}"
         finally:
             root.destroy()
 
-    def test_all_five_tabs_present(self, tmp_path, monkeypatch):
+    def test_all_five_pages_present(self, tmp_path, monkeypatch):
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            notebook = refs.get("notebook")
-            tab_texts = [notebook.tab(i, "text").strip() for i in range(notebook.index("end"))]
-            expected = ["Home", "Profiles", "Accounts", "Activity", "Settings"]
+            app = refs.get("app")
+            expected = ["home", "games", "cloud", "activity", "settings"]
             for e in expected:
-                assert e in tab_texts, f"Missing tab: {e}. Got {tab_texts}"
+                assert e in app.nav_btns, f"Missing nav button: {e}. Got {list(app.nav_btns.keys())}"
         finally:
             root.destroy()
 
@@ -58,8 +56,8 @@ class TestDashboard:
     def test_progress_section_exists(self, tmp_path, monkeypatch):
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            progress = find_labelframe(root, " Progress ")
-            assert progress is not None, "Progress LabelFrame not found"
+            progress = find_labelframe(root, "Progress")
+            assert progress is not None, "Progress section not found"
         finally:
             root.destroy()
 
@@ -80,28 +78,28 @@ class TestDashboard:
         finally:
             root.destroy()
 
-    def test_switch_tabs_updates_view(self, tmp_path, monkeypatch):
+    def test_navigate_pages_updates_view(self, tmp_path, monkeypatch):
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            notebook = refs.get("notebook")
-            for i in range(notebook.index("end")):
-                select_tab(notebook, i)
+            app = refs.get("app")
+            for page in ["home", "games", "cloud", "activity", "settings"]:
+                app._show_page(page)
                 root.update()
         finally:
             root.destroy()
 
-    def test_manage_profiles_button_navigates(self, tmp_path, monkeypatch):
+    def test_manage_games_button_navigates(self, tmp_path, monkeypatch):
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            mgmt_btn = find_button(root, "Manage Profiles →")
-            assert mgmt_btn is not None, "Manage Profiles button not found"
+            mgmt_btn = find_button(root, "Manage Games")
+            assert mgmt_btn is not None, "Manage Games button not found"
         finally:
             root.destroy()
 
-    def test_overview_section_exists(self, tmp_path, monkeypatch):
+    def test_dashboard_header_exists(self, tmp_path, monkeypatch):
         root, refs = create_app(tmp_path, monkeypatch)
         try:
-            overview = find_labelframe(root, " Overview ")
-            assert overview is not None, "Overview LabelFrame not found"
+            header = find_label_containing(root, "Dashboard")
+            assert header is not None, "Dashboard header label not found"
         finally:
             root.destroy()
