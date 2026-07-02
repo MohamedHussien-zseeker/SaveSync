@@ -38,7 +38,7 @@ jobs:
       - name: Package artifact
         shell: pwsh
         run: |
-          $tag = "${{ github.event.release.tag_name || github.ref_name }}"
+          $tag = "${{ github.event.inputs.tag || github.event.release.tag_name || github.ref_name }}"
           $exe_name = "SaveSync-${tag}-windows-x64.exe"
           $hash = (Get-FileHash dist\SaveSync.exe -Algorithm SHA256).Hash.ToLower()
           Copy-Item dist\SaveSync.exe "dist\$exe_name"
@@ -73,7 +73,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = "${{ github.event.release.tag_name }}"
+          $tag = "${{ github.event.inputs.tag || github.event.release.tag_name }}"
           gh release upload $tag "dist/SaveSync-${tag}-windows-x64.exe" --clobber
           gh release upload $tag "dist/SaveSync-${tag}-windows-x64.exe.sha256" --clobber
           gh release upload $tag "dist/build-report-windows.txt" --clobber
@@ -97,7 +97,7 @@ jobs:
 
       - name: Package artifact
         run: |
-          tag="${{ github.event.release.tag_name || github.ref_name }}"
+          tag="${{ github.event.inputs.tag || github.event.release.tag_name || github.ref_name }}"
           exe_name="SaveSync-${tag}-linux-x64"
           hash=$(sha256sum "dist/SaveSync" | cut -d' ' -f1)
           cp "dist/SaveSync" "dist/${exe_name}"
@@ -131,7 +131,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tag="${{ github.event.release.tag_name }}"
+          tag="${{ github.event.inputs.tag || github.event.release.tag_name }}"
           gh release upload "$tag" "dist/SaveSync-${tag}-linux-x64" --clobber
           gh release upload "$tag" "dist/SaveSync-${tag}-linux-x64.tar.gz" --clobber
           gh release upload "$tag" "dist/SaveSync-${tag}-linux-x64.sha256" --clobber
