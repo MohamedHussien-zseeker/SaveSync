@@ -24,7 +24,7 @@ jobs:
       - run: pip install pyinstaller
       - run: pyinstaller SaveSync.spec --noconfirm
 
-      - name: Verify EXE
+      - name: PE validation (MZ header)
         shell: pwsh
         run: |
           $exe = "dist\SaveSync.exe"
@@ -32,8 +32,7 @@ jobs:
           $header = (Get-Content $exe -AsByteStream -TotalCount 2)
           Write-Host "PE header bytes: $($header[0]) $($header[1])"
           if ($header[0] -ne 0x4D -or $header[1] -ne 0x5A) { throw "Not a valid PE" }
-          Write-Host "PE verified (MZ header OK)"
-          Write-Host "GUI binary smoke test: EXE exists and PE header valid"
+          Write-Host "PE header validation: OK (MZ header present)"
 
       - name: Package artifact
         shell: pwsh

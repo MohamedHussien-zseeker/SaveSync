@@ -1,0 +1,52 @@
+name: PR CI
+
+"on":
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  test-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Install deps
+        run: |
+          pip install pyinstaller customtkinter
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb
+      - name: Run tests
+        run: |
+          xvfb-run python3 -m pytest tests/ -v --tb=short
+      - name: Self-test
+        run: python3 SaveSync.py --self-test
+      - name: GUI smoke test
+        run: xvfb-run python3 SaveSync.py --gui-smoke-test
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install pyinstaller
+      - run: pyinstaller SaveSync.spec --noconfirm
+      - name: PE validation
+        shell: pwsh
+        run: |
+          $exe = "dist\SaveSync.exe"
+          if (-not (Test-Path $exe)) { throw "EXE not found" }
+          $bytes = [System.IO.File]::ReadAllBytes($exe)
+          if ($bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw "Not a valid PE (MZ header missing)" }
+          Write-Output "PE validation: OK ($exe)"
+          $hash = Get-FileHash $exe -Algorithm SHA256
+          Write-Output "SHA-256: $($hash.Hash)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SaveSync-windows-x64-PR
+          path: dist/SaveSync.exe
