@@ -21,7 +21,7 @@ jobs:
         with: { ref: '${{ github.event.inputs.tag || github.ref }}' }
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
-      - run: pip install pyinstaller
+      - run: pip install pyinstaller customtkinter
       - run: pyinstaller SaveSync.spec --noconfirm
 
       - name: PE validation (MZ header)
@@ -38,7 +38,8 @@ jobs:
         shell: pwsh
         run: |
           $tag = "${{ github.event.inputs.tag || github.event.release.tag_name || github.ref_name }}"
-          $exe_name = "SaveSync-${tag}-windows-x64.exe"
+          $tag_safe = $tag -replace '/', '-'
+          $exe_name = "SaveSync-${tag_safe}-windows-x64.exe"
           $hash = (Get-FileHash dist\SaveSync.exe -Algorithm SHA256).Hash.ToLower()
           Copy-Item dist\SaveSync.exe "dist\$exe_name"
           Set-Content "dist\$exe_name.sha256" -Value "SHA256 ($exe_name) = $hash"
@@ -49,12 +50,12 @@ jobs:
           Timestamp:    $(Get-Date -Format 'u')
           Commit:       ${{ github.sha }}
           Tag:          $tag
+          Artifact tag: $tag_safe
           Platform:     windows-latest
           Python:       $(python --version 2>&1)
           PyInstaller:  $(pyinstaller --version 2>&1)
           Artifact:     $exe_name
           SHA-256:      $hash
-          Smoke test:   PASSED
           PE verify:    PASSED
           "@
           Set-Content "dist\build-report-windows.txt" -Value $report
@@ -86,7 +87,7 @@ jobs:
         with: { ref: '${{ github.event.inputs.tag || github.ref }}' }
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
-      - run: pip install pyinstaller
+      - run: pip install pyinstaller customtkinter
       - run: pyinstaller SaveSync.spec --noconfirm
 
       - name: Verify binary
@@ -99,7 +100,8 @@ jobs:
       - name: Package artifact
         run: |
           tag="${{ github.event.inputs.tag || github.event.release.tag_name || github.ref_name }}"
-          exe_name="SaveSync-${tag}-linux-x64"
+          tag_safe="${tag//\//-}"
+          exe_name="SaveSync-${tag_safe}-linux-x64"
           hash=$(sha256sum "dist/SaveSync" | cut -d' ' -f1)
           cp "dist/SaveSync" "dist/${exe_name}"
           tar -czf "dist/${exe_name}.tar.gz" "dist/${exe_name}"
