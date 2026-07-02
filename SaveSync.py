@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-__version__ = "2.4.0-beta1"
+__version__ = "2.0.0-rc.1"
 
 
 def _self_test():
@@ -90,6 +90,21 @@ def main():
         print(f"SaveSync v{__version__}")
         return
 
+    if "--help" in sys.argv or "-h" in sys.argv:
+        print("SaveSync — game save backup and sync tool")
+        print()
+        print("Usage: SaveSync [options]")
+        print()
+        print("Options:")
+        print("  --version, -v       Show version and exit")
+        print("  --help, -h          Show this help and exit")
+        print("  --self-test         Run built-in self-test")
+        print("  --gui-smoke-test    Validate UI renders without blocking")
+        print("  --sync-now          Trigger sync on startup")
+        print("  --cancel-after <s>  Cancel ongoing op after N seconds")
+        print("  --close-after <s>   Close app after N seconds")
+        return
+
     if "--self-test" in sys.argv:
         _self_test()
         return
@@ -146,7 +161,7 @@ def _main_impl(sync_now_flag=False, cancel_after=None, close_after=None):
     GREEN = "#9ece6a"
     RED = "#f7768e"
     YELLOW = "#e0af68"
-    BORDER = "#3b4261"
+    BORDER = "#4b5275"
     SEL_BG = "#2f3b6b"
 
     style = ttk.Style()
@@ -154,7 +169,7 @@ def _main_impl(sync_now_flag=False, cancel_after=None, close_after=None):
 
     style.configure(".", background=BG, foreground=FG, fieldbackground=BG2,
                     selectbackground=SEL_BG, selectforeground=FG,
-                    borderwidth=0, focuscolor="")
+                    borderwidth=0, focuscolor=ACCENT)
     style.configure("TFrame", background=BG)
     style.configure("TLabel", background=BG, foreground=FG, font=("Segoe UI", 10))
     style.configure("TButton", background=BG2, foreground=FG, font=("Segoe UI", 9),
@@ -190,7 +205,7 @@ def _main_impl(sync_now_flag=False, cancel_after=None, close_after=None):
                     font=("Segoe UI", 10, "bold"))
     style.configure("Section.TLabel", background=BG, foreground=FG2,
                     font=("Segoe UI", 9, "bold"))
-    style.configure("Empty.TLabel", background=BG, foreground="#565f89",
+    style.configure("Empty.TLabel", background=BG, foreground=FG2,
                     font=("Segoe UI", 9))
     style.configure("StatusBar.TLabel", background=BG2, foreground=FG2,
                     font=("Segoe UI", 9))
@@ -199,7 +214,7 @@ def _main_impl(sync_now_flag=False, cancel_after=None, close_after=None):
                     font=("Segoe UI", 10))
     style.configure("CardHeader.TLabel", background=BG3, foreground=ACCENT,
                     font=("Segoe UI", 10, "bold"))
-    style.configure("CardEmpty.TLabel", background=BG3, foreground="#565f89",
+    style.configure("CardEmpty.TLabel", background=BG3, foreground=FG2,
                     font=("Segoe UI", 9))
 
     status_bar = ttk.Frame(root, style="TFrame")
@@ -633,11 +648,14 @@ def _main_impl(sync_now_flag=False, cancel_after=None, close_after=None):
         dlg.configure(bg=BG)
         dlg.transient(root)
         dlg.grab_set()
+        dlg.bind("<Key-Escape>", lambda e: dlg.destroy())
+        dlg.focus_set()
         frm = ttk.Frame(dlg, padding=16)
         frm.pack(fill=tk.BOTH, expand=True)
         ttk.Label(frm, text="Profile Name:", style="StatusBar.TLabel").pack(anchor=tk.W)
         name_var = tk.StringVar()
-        ttk.Entry(frm, textvariable=name_var, style="TEntry").pack(fill=tk.X, pady=4)
+        name_entry = ttk.Entry(frm, textvariable=name_var, style="TEntry")
+        name_entry.pack(fill=tk.X, pady=4)
         ttk.Label(frm, text="Provider:", style="StatusBar.TLabel").pack(anchor=tk.W, pady=(8, 2))
         prov_var = tk.StringVar(value="local")
         prov_combo = ttk.Combobox(frm, textvariable=prov_var,
@@ -689,10 +707,13 @@ def _main_impl(sync_now_flag=False, cancel_after=None, close_after=None):
             log.audit.action("profile_created", {"profile": name, "type": prov_type})
             _switch_profile(profile)
             dlg.destroy()
+        def _create_on_key(e):
+            do_create()
         ttk.Button(btn_row, text="Cancel", command=dlg.destroy,
                    style="TButton").pack(side=tk.RIGHT, padx=(4, 0))
         ttk.Button(btn_row, text="Create", style="Primary.TButton",
                    command=do_create).pack(side=tk.RIGHT)
+        name_entry.bind("<Return>", _create_on_key)
 
     def _delete_profile():
         p = current_profile[0]
@@ -718,6 +739,8 @@ def _main_impl(sync_now_flag=False, cancel_after=None, close_after=None):
         dlg.configure(bg=BG)
         dlg.transient(root)
         dlg.grab_set()
+        dlg.bind("<Key-Escape>", lambda e: dlg.destroy())
+        dlg.focus_set()
         frm = ttk.Frame(dlg, padding=16)
         frm.pack(fill=tk.BOTH, expand=True)
 
@@ -736,8 +759,7 @@ def _main_impl(sync_now_flag=False, cancel_after=None, close_after=None):
             ttk.Label(frm, text=adapter_cls.client_config_label,
                       style="StatusBar.TLabel").pack(anchor=tk.W)
             hint = ttk.Label(frm, text=adapter_cls.client_config_hint,
-                             foreground="#565f89",
-                             font=("Segoe UI", 8))
+                             style="CardEmpty.TLabel")
             hint.pack(anchor=tk.W, pady=(0, 6))
 
             if provider_type == "google_drive":
@@ -861,6 +883,9 @@ def _main_impl(sync_now_flag=False, cancel_after=None, close_after=None):
         wait_dlg.geometry("450x140")
         wait_dlg.configure(bg=BG)
         wait_dlg.transient(root)
+        wait_dlg.grab_set()
+        wait_dlg.bind("<Key-Escape>", lambda e: [auth_event.set(), wait_dlg.destroy()])
+        wait_dlg.focus_set()
         ttk.Label(wait_dlg,
                   text="Your browser will open.\nAuthorize the app, then return here.",
                   style="StatusBar.TLabel",
@@ -1016,6 +1041,8 @@ def _main_impl(sync_now_flag=False, cancel_after=None, close_after=None):
         dlg.configure(bg=BG)
         dlg.transient(root)
         dlg.grab_set()
+        dlg.bind("<Key-Escape>", lambda e: dlg.destroy())
+        dlg.focus_set()
         frm = ttk.Frame(dlg, padding=16)
         frm.pack(fill=tk.BOTH, expand=True)
         ttk.Label(frm, text="Select provider type:",
@@ -1318,6 +1345,8 @@ def _main_impl(sync_now_flag=False, cancel_after=None, close_after=None):
         dlg.configure(bg=BG)
         dlg.transient(root)
         dlg.grab_set()
+        dlg.bind("<Key-Escape>", lambda e: dlg.destroy())
+        dlg.focus_set()
         frm = ttk.Frame(dlg, padding=24)
         frm.pack(fill=tk.BOTH, expand=True)
         ttk.Label(frm, text="Welcome to SaveSync",

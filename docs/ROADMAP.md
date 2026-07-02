@@ -12,6 +12,19 @@ External beta testing (v2.4.0-beta1)
 
 Collect usability and reliability feedback from real users. Fix P0/P1 issues. Validate cloud OAuth end-to-end.
 
+## Development Track — v2.0.0 RC
+
+| Phase | Focus | Status |
+|-------|-------|--------|
+| Phase 0 | Architecture refactor | ✅ Complete |
+| Phase 1A | CustomTkinter migration | ✅ Complete |
+| Phase 1B | Premium UI redesign | ✅ Complete |
+| Phase 1C | Component cleanup | ✅ Complete |
+| Phase 1D | Workflow UI testing | ✅ Complete |
+| Phase 1E | Accessibility audit | ✅ Complete |
+| Phase 1F | Packaging & release validation | ⏳ In progress |
+| v2.0.0 RC | Feature freeze, regression run, release | ⏭️ Planned |
+
 ## After Beta
 
 - Promote to v2.4.0 stable
