@@ -53,6 +53,20 @@ class TestDashboard:
         finally:
             root.destroy()
 
+    def test_completed_operation_reenables_sync_and_restore(self, tmp_path, monkeypatch):
+        root, refs = create_app(tmp_path, monkeypatch)
+        try:
+            app = refs["app"]
+            app.sync_now_btn.configure(state="disabled")
+            app.restore_btn.configure(state="disabled")
+
+            app._handle_done(True, "Operation complete")
+
+            assert app.sync_now_btn.cget("state") == "normal"
+            assert app.restore_btn.cget("state") == "normal"
+        finally:
+            root.destroy()
+
     def test_progress_section_exists(self, tmp_path, monkeypatch):
         root, refs = create_app(tmp_path, monkeypatch)
         try:

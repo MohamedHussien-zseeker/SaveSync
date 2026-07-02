@@ -1558,9 +1558,9 @@ class SaveSyncApp:
                 parts.append(f"{self._fmt_bytes(spd)}/s")
             if parts:
                 self.bytes_lbl.configure(text="  ".join(parts))
-        self.sync_now_btn.configure(text="Sync Now",
+        self.sync_now_btn.configure(text="Sync Now", state="normal",
                                     fg_color=ACCENT, text_color="#1a1b26")
-        self.restore_btn.configure(text="Restore",
+        self.restore_btn.configure(text="Restore", state="normal",
                                    fg_color="transparent", text_color="#c0caf5")
         self.start_stop_btn.configure(state="normal")
         self.add_prof_btn.configure(state="normal")
