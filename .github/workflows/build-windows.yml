@@ -29,7 +29,7 @@ jobs:
         run: |
           $exe = "dist\SaveSync.exe"
           if (-not (Test-Path $exe)) { throw "EXE not found" }
-          $header = (Get-Content $exe -Encoding Byte -TotalCount 2)
+          $header = (Get-Content $exe -AsByteStream -TotalCount 2)
           if ($header[0] -ne 0x4D -or $header[1] -ne 0x5A) { throw "Not a valid PE" }
           $result = & $exe --version 2>&1
           if ($LASTEXITCODE -ne 0) { throw "--version failed" }
