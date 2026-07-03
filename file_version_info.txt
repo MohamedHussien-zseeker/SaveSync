@@ -23,6 +23,6 @@ VSVersionInfo(
         StringStruct(u'ProductName', u'SaveSync'),
         StringStruct(u'ProductVersion', u'2.0.0-rc.2')])
       ]),
-    VarFileInfo([VarStruct(u'Translation', 0x409, 1200)])
+    VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
   ]
 )
