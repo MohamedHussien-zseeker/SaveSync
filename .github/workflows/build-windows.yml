@@ -34,6 +34,19 @@ jobs:
           if ($header[0] -ne 0x4D -or $header[1] -ne 0x5A) { throw "Not a valid PE" }
           Write-Host "PE header validation: OK (MZ header present)"
 
+      - name: Runtime smoke test
+        shell: pwsh
+        run: |
+          Write-Host "=== --version ==="
+          $ver = & dist\SaveSync.exe --version
+          if (-not $?) { throw "--version failed" }
+          Write-Host $ver
+
+          Write-Host "=== --self-test ==="
+          & dist\SaveSync.exe --self-test
+          if (-not $?) { throw "--self-test failed" }
+          Write-Host "Smoke tests: PASSED"
+
       - name: Package artifact
         shell: pwsh
         run: |

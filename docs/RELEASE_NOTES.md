@@ -51,7 +51,7 @@ Hundreds of automated tests verify profile management, cloud connections, sync/r
 
 ## Download
 
-**Windows build:** Coming soon. A GitHub Actions workflow (`.github/workflows/build-windows.yml`) is ready to produce the Windows EXE automatically. Push a tag and the workflow builds, signs, and uploads it. Windows validation is the final gate before `v2.0.0` stable. This RC validates the Linux build only.
+**Windows build:** The Windows EXE is built automatically from `.github/workflows/build-windows.yml`. RC2 is blocked pending manual validation of the rebuilt Windows executable (see Release Checklist). This release validates the Linux build; Windows is expected to follow once the packaging hardening pass is verified on a real Windows host.
 
 **Linux x64:** `SaveSync-v2.0.0-rc.1-linux-x64` (included below)
 
@@ -75,6 +75,7 @@ Hundreds of automated tests verify profile management, cloud connections, sync/r
 
 - Windows installer and code signing are in progress
 - Windows Defender SmartScreen may show a warning (expected for unsigned software)
+- Windows RC2 is blocked until the rebuilt (no-UPX, metadata-included) EXE is validated on a clean Windows host
 - Cloud providers require your own OAuth application credentials
 - See the full [known issues list](https://github.com/MohamedHussien-zseeker/SaveSync/issues)
 

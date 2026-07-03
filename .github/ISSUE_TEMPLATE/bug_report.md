@@ -24,7 +24,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Environment (please complete the following):**
 - OS: [e.g. Windows 11]
-- SaveSync version: [e.g. v2.0.0-rc.1]
+- SaveSync version: [e.g. v2.0.0-rc.2]
 - Storage provider: [e.g. Local, Google Drive, Dropbox, OneDrive]
 
 **Additional context**

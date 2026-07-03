@@ -1,4 +1,4 @@
-# Release Validation Checklist — SaveSync v2.0.0-rc.1
+# Release Validation Checklist — SaveSync v2.0.0-rc.2
 
 ## Build Validation
 
@@ -6,8 +6,8 @@
 |------|--------|-------|
 | PyInstaller build completes without errors | ✅ Pass | `pyinstaller SaveSync.spec` clean |
 | Binary is executable | ✅ Pass | ELF 64-bit LSB executable, stripped |
-| Binary size is reasonable | ✅ Pass | 13 MB single-file executable |
-| `--version` reports correct version | ✅ Pass | `SaveSync v2.4.0-beta1` |
+| Binary size is reasonable | ✅ Pass | ~13 MB single-file executable |
+| `--version` reports correct version | ✅ Pass | `SaveSync v2.0.0-rc.2` |
 | `--help` lists all options | ✅ Pass | 6 flags documented |
 | `--self-test` passes | ✅ Pass | Validates core imports |
 | `--gui-smoke-test` passes | ✅ Pass | All tabs render without blocking |
@@ -23,7 +23,7 @@
 | Checksums file created | ✅ Pass | `dist/checksums.txt` |
 | Build is reproducible from source | ✅ ⚠️ | Same spec + source → same bytecode; binary may vary by PyInstaller/libc version |
 
-## Runtime Validation
+## Runtime Validation (Linux)
 
 | Item | Status | Notes |
 |------|--------|-------|
@@ -34,11 +34,31 @@
 | Version works without DISPLAY | ✅ Pass | No X server needed for `--version` |
 | Help works without DISPLAY | ✅ Pass | No X server needed for `--help` |
 
+## Windows CI Validation
+
+| Item | Status | Notes |
+|------|--------|-------|
+| PyInstaller EXE built without errors | ⏳ Pending | CI builds `SaveSync.exe` from spec |
+| PE header valid (MZ magic) | ⏳ Pending | Static PE validation |
+| `--version` in CI | ⏳ Pending | Verifies EXE runs, reports version |
+| `--self-test` in CI | ⏳ Pending | Validates all module imports/init |
+| EXE artifact uploaded | ⏳ Pending | Available for download + manual test |
+| SHA-256 checksum recorded | ⏳ Pending | Per-artifact checksum |
+
+## Windows Manual Validation (Release Gate)
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Defender does not block EXE | ⏳ Pending | Must be verified on clean Windows host |
+| GUI launches from packaged EXE | ⏳ Pending | Double-click opens CTk window |
+| All sidebar pages render | ⏳ Pending | Home, Games, Cloud, Activity, Settings |
+| `--gui-smoke-test` passes | ⏳ Pending | Headless render on Windows (requires display) |
+| Screenshots regenerated from validated EXE | ⏳ Pending | Replace RC1 screenshots |
+
 ## Known Gaps (Non-Blocking)
 
 | Item | Notes |
 |------|-------|
-| Windows installer | Linux-only build environment; Windows requires cross-compile or CI |
+| Windows installer | Not yet created; EXE is standalone |
 | Code signing | Requires certificate; not available in current env |
 | Auto-update mechanism | Not yet implemented |
-| Application icon | No `.ico` file bundled; uses default tkinter icon |

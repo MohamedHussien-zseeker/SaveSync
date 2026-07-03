@@ -33,7 +33,7 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=False,
     upx_exclude=[],
     runtime_tmpdir=None,
     console=False,
@@ -42,13 +42,13 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,
-    version=None,
+    icon='assets/SaveSync.ico',
+    version='file_version_info.txt',
 )
 
 app = BUNDLE(
     exe,
     name='SaveSync.app',
-    icon=None,
+    icon='assets/SaveSync.ico',
     bundle_identifier=None,
 )
