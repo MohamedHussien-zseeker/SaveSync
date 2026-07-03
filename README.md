@@ -9,7 +9,7 @@
 
 SaveSync automatically backs up, syncs, and restores your PC game saves so you can recover from crashes, reinstalls, or hardware failures with a single click.
 
-[![Release](https://img.shields.io/badge/release-v2.0.0--rc.2-blue)][release]
+[![Release](https://img.shields.io/badge/release-v2.0.0--stable-blue)][release]
 [![Platform](https://img.shields.io/badge/platform-windows%20%7C%20linux-lightgrey)](#)
 [![Tests](https://img.shields.io/badge/tests-193%20passing-brightgreen)](#)
 [![License](https://img.shields.io/badge/license-proprietary-darkblue)](#)
@@ -20,9 +20,9 @@ SaveSync automatically backs up, syncs, and restores your PC game saves so you c
 
 Get the latest version from the [releases page][release].
 
-**Windows:** Download `SaveSync-v2.0.0-rc.2-windows-x64.exe` and run it.
+**Windows:** Download `SaveSync-v2.0.0-windows-x64.exe` and run it.
 
-**Linux:** Download `SaveSync-v2.0.0-rc.2-linux-x64` or the `.tar.gz` archive.
+**Linux:** Download `SaveSync-v2.0.0-linux-x64` or the `.tar.gz` archive.
 
 No installation required — single executable, no dependencies.
 
@@ -113,4 +113,4 @@ Setup takes 30 seconds. After that, SaveSync watches for changes automatically.
 
 Proprietary. All rights reserved.
 
-[release]: https://github.com/MohamedHussien-zseeker/SaveSync/releases/tag/v2.0.0-rc.2
+[release]: https://github.com/MohamedHussien-zseeker/SaveSync/releases/tag/v2.0.0
