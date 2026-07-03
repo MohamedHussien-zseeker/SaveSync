@@ -35,7 +35,7 @@
 ### Out-of-Scope
 
 - Visual regression / screenshot comparison
-- Backend unit tests (153 existing in `test_savesync.py`)
+- Backend unit tests (193 existing across all test files)
 - Cloud provider OAuth flows (require real credentials / network)
 - Performance or load testing (covered by test_concurrency_stress.py)
 - Cross-platform testing (Windows-first GUI)

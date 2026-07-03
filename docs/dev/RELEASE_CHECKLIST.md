@@ -30,7 +30,7 @@
 | Smoke test passes at 100% DPI | ✅ Pass | Xvfb 96 DPI |
 | Smoke test passes at 150% DPI | ✅ Pass | Xvfb 144 DPI |
 | Smoke test passes at 200% DPI | ✅ Pass | Xvfb 192 DPI |
-| Full test suite (192 tests) | ✅ Pass | All pass at 150% DPI |
+| Full test suite (193 tests) | ✅ Pass | All pass at 150% DPI |
 | Version works without DISPLAY | ✅ Pass | No X server needed for `--version` |
 | Help works without DISPLAY | ✅ Pass | No X server needed for `--help` |
 

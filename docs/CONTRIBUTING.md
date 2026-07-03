@@ -66,7 +66,7 @@ Tests live in `tests/` and use pytest:
 | `test_upgrade.py` | Config migration from v1.x |
 | `failure_policy.py` | Failure hook registry for test injection |
 
-All 153 tests must pass before any merge:
+All 193 tests must pass before any merge:
 ```bash
 python -m pytest tests/ -v --tb=short
 ```
@@ -76,9 +76,8 @@ python -m pytest tests/ -v --tb=short
 ## Pull Request Process
 
 1. Ensure all tests pass.
-2. Update `RELEASE_NOTES.md` if the change affects users.
-3. Update `DECISIONS.md` if the change represents a new architectural decision.
-4. No new features during v2.4.x beta — only P0 (data loss/crash) and P1 (broken workflow) fixes.
+2. Update relevant GitHub release notes if the change affects users.
+3. Update `docs/dev/DECISIONS.md` if the change represents a new architectural decision.
 
 ---
 
@@ -86,6 +85,5 @@ python -m pytest tests/ -v --tb=short
 
 SaveSync follows semver-style versioning: `major.minor.patch[-pre]`.
 
-- Pre-release tags (`-beta1`, `-rc1`) indicate unstable builds.
+- Pre-release tags (`-rc1`, `-rc2`) indicate unstable builds.
 - Stable releases have no suffix.
-- The v2.4.x branch is frozen for beta. Breaking changes wait for v2.5.

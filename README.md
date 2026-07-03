@@ -5,15 +5,49 @@
 
 # SaveSync
 
-**Automatic backup, synchronization, and restoration for PC game saves.**
+**Never lose your game saves again.**
 
-SaveSync continuously protects your save files locally or in the cloud so you can recover from crashes, reinstalls, or hardware failures with a single click.
+SaveSync automatically backs up, syncs, and restores your PC game saves so you can recover from crashes, reinstalls, or hardware failures with a single click.
 
-[![Release](https://img.shields.io/badge/release-v2.0.0--rc.1-blue)][release]
-[![Python](https://img.shields.io/badge/python-3.12-blue)](#)
+[![Release](https://img.shields.io/badge/release-v2.0.0--rc.2-blue)][release]
 [![Platform](https://img.shields.io/badge/platform-windows%20%7C%20linux-lightgrey)](#)
-[![Tests](https://img.shields.io/badge/tests-192%20passing-brightgreen)](#)
+[![Tests](https://img.shields.io/badge/tests-193%20passing-brightgreen)](#)
 [![License](https://img.shields.io/badge/license-proprietary-darkblue)](#)
+
+---
+
+## Download
+
+Get the latest version from the [releases page][release].
+
+**Windows:** Download `SaveSync-v2.0.0-rc.2-windows-x64.exe` and run it.
+
+**Linux:** Download `SaveSync-v2.0.0-rc.2-linux-x64` or the `.tar.gz` archive.
+
+No installation required — single executable, no dependencies.
+
+---
+
+## Quick Start
+
+1. **Launch SaveSync** — the main window opens with a Default profile
+2. **Choose your save folder** — click Add Folder and select your game's save directory
+3. **Choose a backup destination** — pick a local folder, external drive, or connect a cloud provider
+4. **Click Sync Now** — your saves are copied and verified
+
+Setup takes 30 seconds. After that, SaveSync watches for changes automatically.
+
+---
+
+## Supported Storage
+
+| Storage | Type | Account Required |
+|---|---|---|
+| Local folder | Local | No |
+| External drive / USB | Local | No |
+| Google Drive | Cloud | Yes |
+| Dropbox | Cloud | Yes |
+| OneDrive | Cloud | Yes |
 
 ---
 
@@ -31,89 +65,52 @@ SaveSync continuously protects your save files locally or in the cloud so you ca
 
 ## Features
 
-| Feature | Status |
-|---|---|
-| Automatic file monitoring | ✅ |
-| One-click restore with verification | ✅ |
-| SHA-256 integrity checking | ✅ |
-| Multiple backup profiles | ✅ |
-| Activity log with filtering | ✅ |
-| Local folder backup | ✅ |
-| External drive support | ✅ |
-| Google Drive cloud sync | ✅ |
-| Dropbox cloud sync | ✅ |
-| OneDrive cloud sync | ✅ |
-| Background daemon mode | ✅ |
-| Real-time sync progress | ✅ |
-| Accessibility compliant (WCAG AA) | ✅ |
-| 192 automated tests | ✅ |
+- Automatic file monitoring — no manual scanning needed
+- One-click restore with SHA-256 verification
+- Multiple backup profiles for different games
+- Background sync with live progress tracking
+- Local, external drive, Google Drive, Dropbox, and OneDrive support
+- Activity log with filtering
 
-## Architecture
+---
 
-```
-┌─────────────┐
-│   UI Layer  │  CustomTkinter-themed desktop GUI (ttk, Tokyo Night)
-├─────────────┤
-│   Profiles  │  Named profiles with per-profile watch dirs & providers
-├─────────────┤
-│ Sync Engine │  Background threads, progress tracking, cancellation
-├─────────────┤
-│  Storage    │  Local FS  │  Google Drive  │  Dropbox  │  OneDrive
-└─────────────┘
-```
+## Why You Can Trust SaveSync
 
-## Quick Start
+- **SHA-256 verification** on every backup and restore
+- **Open source** — review the code, build it yourself
+- **Local-first** — works fully offline; cloud is optional
+- **193 automated tests** covering backup, restore, sync, and reliability
 
-1. **Download** SaveSync from the [latest release][release].
-2. **Launch it** — the main window opens with a Default profile.
-3. **Choose your save folder** — click Add Folder and select your game's save directory.
-4. **Choose a backup destination** — pick a local folder, external drive, or connect a cloud provider.
-5. **Click Sync Now** — your saves are copied and verified.
-
-Setup takes 30 seconds. After that, SaveSync watches for changes automatically.
-
-## Supported Storage
-
-| Storage | Type | Account Required |
-|---|---|---|
-| Local folder | Local | No |
-| External drive / USB | Local | No |
-| Google Drive | Cloud | Yes (BYO credentials) |
-| Dropbox | Cloud | Yes (BYO credentials) |
-| OneDrive | Cloud | Yes (BYO credentials) |
-
-## Quality
-
-| Metric | Value |
-|---|---|
-| Automated tests | 192 passing |
-| Test type | Workflow (CRUD, sync, restore, lifecycle) |
-| Accessibility checklist | 38 items, all passing |
-| GUI testing | Headless Xvfb, all DPIs (96–192) |
-| Test determinism | No network, no credentials, no `sleep()` |
-
-## Documentation
-
-| Audience | Docs |
-|---|---|
-| New users | [Quick Start](#quick-start) |
-| Developers | [Architecture](docs/ARCHITECTURE.md) · [Design Principles](docs/DESIGN_PRINCIPLES.md) · [Decisions](DECISIONS.md) |
-| Beta testers | [Release Notes](docs/RELEASE_NOTES.md) · [Known Issues](docs/BETA_STATUS.md) |
+---
 
 ## System Requirements
 
 - **Windows:** 7, 8, 10, 11 (64-bit)
-- **Linux:** Development builds available
+- **Linux:** x64 (development builds available)
 - **No dependencies** — single executable, nothing to install
+
+---
 
 ## Known Limitations
 
-- Cloud providers require your own OAuth app credentials (setup guide included)
-- Windows installer and code signing are pending the final release
-- See the [release notes](docs/RELEASE_NOTES.md) for the complete list
+- Unsigned Windows executable may trigger SmartScreen (click "Run anyway")
+- Cloud storage requires your own OAuth app credentials (setup guide included)
+- Automatic updates not yet implemented
+
+---
+
+## For Developers
+
+- [Architecture](docs/dev/ARCHITECTURE.md)
+- [Design Principles](docs/dev/DESIGN_PRINCIPLES.md)
+- [Contributing](docs/CONTRIBUTING.md)
+- [Decisions](docs/dev/DECISIONS.md)
+- [Security Policy](docs/SECURITY.md)
+
+---
 
 ## License
 
 Proprietary. All rights reserved.
 
-[release]: https://github.com/MohamedHussien-zseeker/SaveSync/releases/tag/v2.0.0-rc.1
+[release]: https://github.com/MohamedHussien-zseeker/SaveSync/releases/tag/v2.0.0-rc.2

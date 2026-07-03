@@ -43,7 +43,7 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon='assets/SaveSync.ico',
-    version='file_version_info.txt',
+    version='assets/file_version_info.txt',
 )
 
 app = BUNDLE(

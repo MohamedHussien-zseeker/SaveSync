@@ -109,4 +109,4 @@ New entries follow this template:
 - **Context:** The application protects users' game saves — data with emotional and time value that cannot be replaced.
 - **Alternatives:** Ship features faster, fix bugs when reported.
 - **Rationale:** A backup tool that loses data is worse than no backup tool. Every feature must prove it handles failure before it ships. This principle governs code review, testing (including failure injection tests), and release criteria. It is the project's most important priority.
-- **Consequences:** Slightly slower feature delivery. Higher testing burden (all 153 tests must pass, including failure injection scenarios). Restore pipeline is tested with the same rigor as sync. Error handling is a first-class concern, not an afterthought.
+- **Consequences:** Slightly slower feature delivery. Higher testing burden (all 193 tests must pass, including failure injection scenarios). Restore pipeline is tested with the same rigor as sync. Error handling is a first-class concern, not an afterthought.
