@@ -11,7 +11,7 @@ from typing import Optional
 
 import customtkinter as ctk
 
-__version__ = "2.0.0-rc.2"
+__version__ = "2.0.0"
 
 
 def _self_test():
