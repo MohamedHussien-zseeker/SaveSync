@@ -29,7 +29,7 @@ python -m pytest tests/ -v
 
 Build Windows EXE (requires Docker on a Linux host):
 ```bash
-# See SETUP.md for the full build pipeline
+# See .github/workflows/build-windows.yml for the full build pipeline
 ```
 
 ---

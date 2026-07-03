@@ -97,7 +97,7 @@ Setup takes 30 seconds. After that, SaveSync watches for changes automatically.
 | Audience | Docs |
 |---|---|
 | New users | [Quick Start](#quick-start) |
-| Developers | [Architecture](docs/ARCHITECTURE.md) · [Design Principles](docs/DESIGN_PRINCIPLES.md) · [Decisions](docs/DECISIONS.md) |
+| Developers | [Architecture](docs/ARCHITECTURE.md) · [Design Principles](docs/DESIGN_PRINCIPLES.md) · [Decisions](DECISIONS.md) |
 | Beta testers | [Release Notes](docs/RELEASE_NOTES.md) · [Known Issues](docs/BETA_STATUS.md) |
 
 ## System Requirements
