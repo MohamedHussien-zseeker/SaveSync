@@ -1,5 +1,5 @@
 # Windows build dependencies — Python 3.7 compatible (pinned)
 # Install BEFORE running build_exe.bat:
 #   pip install -r requirements-windows.txt
-pyinstaller==5.13.2
+pyinstaller==6.15.0
 dropbox==11.36.2
