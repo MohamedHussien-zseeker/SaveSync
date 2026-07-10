@@ -77,7 +77,7 @@ Setup takes 30 seconds. After that, SaveSync watches for changes automatically.
 ## Why You Can Trust SaveSync
 
 - **SHA-256 verification** on every backup and restore
-- **Open source** — review the code, build it yourself
+- **Transparent** — clear documentation of how saves are handled
 - **Local-first** — works fully offline; cloud is optional
 - **193 automated tests** covering backup, restore, sync, and reliability
 
