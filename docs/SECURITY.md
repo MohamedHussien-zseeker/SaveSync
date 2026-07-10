@@ -32,7 +32,7 @@ Nothing. SaveSync contains no telemetry, analytics, crash reporting, or usage tr
 If you discover a security vulnerability in SaveSync:
 
 1. **Do not** open a public GitHub issue.
-2. Email your report to [security@savesync.app — pending].
+2. Use [GitHub Security Advisories](https://github.com/MohamedHussien-zseeker/SaveSync/security/advisories/new) to report privately.
 3. Include a description of the issue, steps to reproduce, and the version you tested.
 4. You should receive an acknowledgment within 72 hours.
 5. We aim to release a fix within 30 days of confirmation.
